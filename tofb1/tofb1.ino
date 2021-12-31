@@ -5,7 +5,9 @@
 #include <SPI.h> 
 #include <Wire.h> 
 #include <ArduinoJson.h>
-#include <DHT.h>
+
+#include <Adafruit_BMP280.h>
+#include <Adafruit_Sensor.h>
 //Provide the token generation process info.
 #include "addons/TokenHelper.h"
 //Provide the RTDB payload printing info and other helper functions.
@@ -14,27 +16,28 @@
 // Insert your network credentials
 #define WIFI_SSID "Arunkumar M"
 #define WIFI_PASSWORD "arun_2002"
-#define DHTPIN 4
-#define DHTTYPE DHT11
 // Insert Firebase project API Key
-#define API_KEY "AIzaSyBWYbQAyNRSdDtik6Ws_B3KOle4SHDOu9w"
+#define API_KEY "REPLACE_WITH_YOUR_FIREBASE_PROJECT_API_KEY"
 
 // Insert RTDB URLefine the RTDB URL */
-#define DATABASE_URL "https://espdemojs-default-rtdb.asia-southeast1.firebasedatabase.app/" 
+#define DATABASE_URL "REPLACE_WITH_YOUR_FIREBASE_DATABASE_URL" 
 
+#define BMP_SCK (13); 
+#define BMP_MISO (12); 
+#define BMP_MOSI (11); 
+#define BMP_CS (10);
 //Define Firebase Data object
 FirebaseData fbdo;
 
 FirebaseAuth auth;
 FirebaseConfig config;
-DHT dht(DHTPIN, DHTTYPE);
+Adafruit_BMP280 bmp; 
 unsigned long sendDataPrevMillis = 0;
 int count = 0;
 bool signupOK = false;
 
 void setup(){
   Serial.begin(115200);
-  dht.begin();
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to Wi-Fi");
   while (WiFi.status() != WL_CONNECTED){
@@ -66,6 +69,15 @@ void setup(){
   
   Firebase.begin(&config, &auth);
   Firebase.reconnectWiFi(true);
+  if (!bmp.begin(0x76)) {
+    Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
+  }
+  /* Default settings from datasheet. */
+  bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
+                  Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
+                  Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
+                  Adafruit_BMP280::FILTER_X16,      /* Filtering. */
+                  Adafruit_BMP280::STANDBY_MS_500);
 }
 
 void loop(){
@@ -73,7 +85,7 @@ void loop(){
     sendDataPrevMillis = millis();
     
     // Write an Float number on the database path test/float
-    if (Firebase.RTDB.setFloat(&fbdo, "test/temperature",dht.readTemperature())){
+    if (Firebase.RTDB.setFloat(&fbdo, "test/temperature",bmp.readTemperature())){
       Serial.println("PASSED");
       Serial.println("PATH: " + fbdo.dataPath());
       Serial.println("TYPE: " + fbdo.dataType());
@@ -82,7 +94,7 @@ void loop(){
       Serial.println("FAILED");
       Serial.println("REASON: " + fbdo.errorReason());
     }
-    if (Firebase.RTDB.setFloat(&fbdo, "test/humidity",dht.readHumidity())){
+    if (Firebase.RTDB.setFloat(&fbdo, "test/humidity",bmp.readPressure()/100)){
       Serial.println("PASSED");
       Serial.println("PATH: " + fbdo.dataPath());
       Serial.println("TYPE: " + fbdo.dataType());
