@@ -81,7 +81,7 @@ void setup(){
 String convertToString(char* a, int size)
 {
     int i;
-    string s = "";
+    String s = "";
     for (i = 0; i < size; i++) {
         s = s + a[i];
     }
@@ -93,7 +93,17 @@ String tellTime()
   struct tm timeinfo;
   getLocalTime(&timeinfo);
   char a[22];
-  strftime(a,22, "%Y-%m-%d - %X", timeinfo);
+  strftime(a,22, "%Y-%m-%d - %X", &timeinfo);
+  String t=convertToString(a,22);
+  return t;
+}
+
+String tellDate()
+{
+  struct tm timeinfo;
+  getLocalTime(&timeinfo);
+  char a[22];
+  strftime(a,22, "%X", &timeinfo);
   String t=convertToString(a,22);
   return t;
 } 
@@ -101,11 +111,12 @@ String tellTime()
 void loop(){
   
   //sending data
-  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 15000 || sendDataPrevMillis == 0)){
+  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 300000 || sendDataPrevMillis == 0)){
     sendDataPrevMillis = millis();
     String time=tellTime();
+    String date=tellDate();
     // Write an Float number on the database path test/float
-    if (Firebase.RTDB.setFloat(&fbdo, "sensor/"+time+"/temperature",dht.readTemperature())){
+    if (Firebase.RTDB.setFloat(&fbdo, "temperature/"+date+"/"+time,dht.readTemperature())){
       Serial.println("PASSED");
       Serial.println("PATH: " + fbdo.dataPath());
       Serial.println("TYPE: " + fbdo.dataType());
@@ -114,7 +125,7 @@ void loop(){
       Serial.println("FAILED");
       Serial.println("REASON: " + fbdo.errorReason());
     }
-    if (Firebase.RTDB.setFloat(&fbdo, "test/"+time+"/humidity",dht.readHumidity())){
+    if (Firebase.RTDB.setFloat(&fbdo, "humidity/"+date+"/"+time,dht.readHumidity())){
       Serial.println("PASSED");
       Serial.println("PATH: " + fbdo.dataPath());
       Serial.println("TYPE: " + fbdo.dataType());
