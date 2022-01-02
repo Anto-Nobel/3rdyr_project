@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--                 Bootstrap CSS                  -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>
+    <!--                  Custom CSS                    -->
+    <link rel="stylesheet" href="/style.css">
+    <title>Document</title>
+</head>
+<body>
+<div class="container">
+<!--                    Heading Section                  -->
+    <header class="mt-2">
+        <img src="/Images/RMK-Engineering-College-Logo.png" alt="rmk_logo">
+        <div class="collegeInfo">
+            <h1>R.M.K Engineering College </h1>
+            <p>An Autonomous Institution Approved by AICTE, New Delhi</p>
+        </div>
+        <img src="/Images/rmkLogo2.jpg" class="rmkLogo2" alt="rmk_logo_2">
+    </header>
+
+<!--                    Nav Bar                         -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse d-flex justify-content-around" id="navbarNavAltMarkup" style="transition: 1s;">
+            <div class="navbar-nav" id="navbarNavAltMarkup">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+                <a class="nav-link active" href="#">Pollution Monitor</a>
+                <a class="nav-link active" href="#">Monthly report</a>
+                <a class="nav-link active" href="#">Contact us</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!--                    Date Picker                      -->
+<div class="input-group mt-4 mb-4" id="date-picker-width">
+    <i class="bi bi-calendar-date input-group-text"></i>
+    <input type="text" class="datepicker_input form-control" placeholder="Enter the date" required
+        aria-label="Date input 3 (using aria-label)">
+</div>
+
+<!--                    Table                           -->
+<table class="table text-center table-success">
+    <thead>
+        <th>Sensor</th>
+        <th id="time1">Time1</th>
+        <th id="time2">Time2</th>
+        <th id="time3">Time3</th>
+        <th id="time4">Time4</th>
+    </thead>
+    <tbody id="tbody1"></tbody>
+</table>
+<div id="ex">
+</div>
+
+</div>
+
+<!--                     Date Picker Js                     -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js'></script>
+<!--                     Custom Js                     -->
+    <script src="/index.js"></script>
+<!--                     Main Internal Js                    -->
+    <script type="module">
+//----------------------Iniialising--------------------------//
+
+        const headingAddress = document.getElementById("ex");
+        const tbody = document.getElementById("tbody1");
+        const time1 = document.getElementById("time1")
+        const time2 = document.getElementById("time2")
+        const time3 = document.getElementById("time3")
+        const time4 = document.getElementById("time4")
+
+//-----------------Adding data to table---------------------//
+
+        function addAllItemToTable(nameOfSensor,data){
+            
+            let trow = document.createElement("tr");
+
+            let td1 = document.createElement("td");
+            let td2 = document.createElement("td");
+            let td3 = document.createElement("td");
+            let td4 = document.createElement("td");
+            let td5 = document.createElement("td");
+
+            td1.classList.add("table-light")
+
+            td1.innerHTML = nameOfSensor;
+            td2.innerHTML = data[0];
+            td3.innerHTML = data[1];
+            td4.innerHTML = data[2];
+            td5.innerHTML = data[3];
+
+            trow.appendChild(td1);
+            trow.appendChild(td2);
+            trow.appendChild(td3);
+            trow.appendChild(td4);
+            trow.appendChild(td5);
+
+            tbody.appendChild(trow);
+        }
+//-----------------Firebase pack---------------------//
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWYbQAyNRSdDtik6Ws_B3KOle4SHDOu9w",
+            authDomain: "espdemojs.firebaseapp.com",
+            databaseURL: "https://espdemojs-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "espdemojs",
+            storageBucket: "espdemojs.appspot.com",
+            messagingSenderId: "34724927902",
+            appId: "1:34724927902:web:f242833caabd96dc16de8f"
+        };
+        const app = initializeApp(firebaseConfig);
+         import { getDatabase, ref, set, get, child, update, remove, onValue }
+                from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"
+
+            const db = getDatabase();
+
+function formatFinder(time){
+    let timeString = time[3];
+    let getHourFromString = timeString.split(":")
+    let hourArr = getHourFromString[0];
+    if (hourArr > 0 && hourArr < 12){
+        return "AM"
+    }else{
+        return "PM"
+    }
+}
+//-----------------Getting All data at Once---------------------//
+            function getAllDataOnce() {
+                    const dbref = ref(db);
+                    get(child(dbref, "humidity"))
+                        .then((snapshot) => {
+                            let humidityDataKey = [];
+                            let humidityDataVal = [];
+                            let senName = "Humidity"
+                            snapshot.forEach(childSnapShot => {
+                                let keyValueOfObject = childSnapShot.key; 
+                                humidityDataKey.push(keyValueOfObject);
+                                humidityDataVal.push(childSnapShot.val());
+                            });
+                            console.log(humidityDataKey[0]);
+                            console.log(humidityDataKey[1]);
+                            console.log(humidityDataKey[2]);
+                            console.log(humidityDataKey[3]);
+                            addAllItemToTable(senName,humidityDataVal);
+                            let timeBox1 = humidityDataKey[0].split("-")
+                            let timeBox2 = humidityDataKey[1].split("-")
+                            let timeBox3 = humidityDataKey[2].split("-")
+                            let timeBox4 = humidityDataKey[3].split("-")
+                            
+                            
+                            time1.innerHTML = `${timeBox1[3]} ${formatFinder(timeBox1)}`
+                            time2.innerHTML = `${timeBox2[3]} ${formatFinder(timeBox2)}`
+                            time3.innerHTML = `${timeBox3[3]} ${formatFinder(timeBox3)}`
+                            time4.innerHTML = `${timeBox4[3]} ${formatFinder(timeBox4)}`
+                            
+                        });
+                         get(child(dbref, "temperature"))
+                        .then((snapshot) => {
+                        let temperatureDataKey = [];
+                        let temperatureDataVal = [];
+                        let tempName = "Temperature"
+                        snapshot.forEach(childSnapShot => {
+                            let keyValueOfObject = childSnapShot.key;
+                            temperatureDataKey.push(keyValueOfObject);
+                            temperatureDataVal.push(childSnapShot.val());
+                        });
+                        addAllItemToTable(tempName,temperatureDataVal)
+                    });
+                }
+                 window.onload = getAllDataOnce;
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+<!--
+//    for(let i=0;i<humidityDataKey.length;i++){
+//        let headingData = document.createElement("H1")
+//        headingData.innerHTML = `DATE : ${humidityDataKey[i]}    Humidity Reading : ${humidityDataVal[i]}`;
+//        headingAddress.appendChild(headingData);
+//    } 
+
+console.log(humidityDataKey.length);
+console.log("keys : ",humidityDataKey);
+console.log("Val : ", humidityDataVal); -->

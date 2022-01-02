@@ -1,0 +1,63 @@
+header {
+  display: flex;
+  justify-content: space-between;
+}
+header img {
+  height: 6rem;
+}
+.collegeInfo {
+  text-align: center;
+}
+header h1 {
+  font-size: 3rem;
+}
+header.rmkLogo2 {
+  height: 3rem;
+}
+.navbar-nav a {
+  margin: 0 4rem;
+  font-size: 1.2rem;
+}
+.navbar-nav a:hover {
+  font-size: 1.22rem;
+  transition: 0.3s;
+}
+
+#date-picker-width {
+  width: 30%;
+}
+@media only screen and (max-width: 1000px) {
+  header h1 {
+    font-size: 2rem;
+  }
+  header img {
+    height: 4rem;
+  }
+}
+
+@media only screen and (max-width: 760px) {
+  header h1 {
+    font-size: 1.5rem;
+  }
+  header img {
+    height: 4rem;
+  }
+  .collegeInfo p {
+    font-size: 1rem;
+  }
+}
+
+@media only screen and (max-width: 505px) {
+  header h1 {
+    font-size: 1.3rem;
+  }
+  header img {
+    height: 3rem;
+  }
+  .collegeInfo p {
+    font-size: 0.8rem;
+  }
+  #date-picker-width {
+    width: 100%;
+  }
+}
