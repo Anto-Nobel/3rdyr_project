@@ -1,28 +1,18 @@
 #include <Arduino.h>
-
-#include <WiFi.h>
-
+#ifdef ESP32  
+  #include <WiFi.h>
+#endif
 #include <Firebase_ESP_Client.h>
-
-
-
 #include <SPI.h> 
-
 #include <Wire.h> 
-
 #include <ArduinoJson.h>
-
 #include <DHT.h>
-
 //Provide the token generation process info.
-
 #include "addons/TokenHelper.h"
-
 //Provide the RTDB payload printing info and other helper functions.
-
 #include "addons/RTDBHelper.h"
-
 #include "time.h"
+
 
 
 
@@ -61,8 +51,6 @@ FirebaseConfig config;
 DHT dht(DHTPIN, DHTTYPE);
 
 unsigned long sendDataPrevMillis = 0;
-
-int count = 0;
 
 bool signupOK = false;
 
@@ -219,12 +207,8 @@ String tellDate()
 
 
 void loop(){
-
-  
-
   //sending data
-
-  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 300000 || sendDataPrevMillis == 0)){
+  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 60000 || sendDataPrevMillis == 0)){
 
     sendDataPrevMillis = millis();
     String timeStamp=tellTime();
@@ -232,20 +216,21 @@ void loop(){
     FirebaseJson json;
     if(!(Firebase.RTDB.getInt(&fbdo,"test1/temperature/"+currDate)))
     {
+      Serial.println("date not found\nso new node created");
       count=0;
     }
     if(count==0)
     {
       json.setDouble("temperature/"+currDate+"/"+timeStamp,dht.readTemperature());
-      Firebase.RTDB.set(&fbdo,F("test1"),&json);
-      
+      //Firebase.RTDB.set(&fbdo,F("test1"),&json);
+      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/test1"), &json) ? "ok" : fbdo.errorReason().c_str());
     }
     else
     {
       json.add(timeStamp,dht.readTemperature());
-      Firebase.RTDB.updateNode(&fbdo,F("test1/temperature/"+currDate),&json);
+      //Firebase.RTDB.updateNode(&fbdo,"test1/temperature/"+currDate,&json);
+      Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "test1/temperature/"+currDate, &json) ? "ok" : fbdo.errorReason().c_str());
     }  
     count++;
   }
-
 }
