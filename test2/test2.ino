@@ -198,7 +198,7 @@ String tellDate()
 
   char a[22];
 
-  strftime(a,22, "%d/%m/%Y", &timeinfo);
+  strftime(a,22, "%d-%m-%Y", &timeinfo);
 
   String t=convertToString(a,22);
 
@@ -214,7 +214,7 @@ void loop(){
 
   //sending data
 
-  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 300000 || sendDataPrevMillis == 0)){
+  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 30000 || sendDataPrevMillis == 0)){
 
     sendDataPrevMillis = millis();
     String timeStamp=tellTime();
