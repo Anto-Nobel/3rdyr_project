@@ -1,5 +1,7 @@
 #include <Arduino.h>
-#include <WiFi.h>
+#ifdef ESP32
+  #include <WiFi.h>
+#endif
 #include <Firebase_ESP_Client.h>
 
 #include <SPI.h> 
@@ -225,13 +227,15 @@ void loop(){
     if(count==0)
     {
       json.set("temperature/"+currDate+"/"+timeStamp,dht.readTemperature());
-      Firebase.RTDB.set(&fbdo,F("test1"),&json);
+      //Firebase.RTDB.set(&fbdo,F("test1"),&json);
+      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/test1"), &json) ? "ok" : fbdo.errorReason().c_str());
       
     }
     else
     {
       json.add(timeStamp,dht.readTemperature());
-      Firebase.RTDB.updateNode(&fbdo,F("test1/temperature/"+currDate),&json);
+      //Firebase.RTDB.updateNode(&fbdo,F("test1/temperature/"+currDate),&json);
+      Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "test1/temperature/"+currDate, &json) ? "ok" : fbdo.errorReason().c_str());
     }  
     count++;
   }
