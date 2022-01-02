@@ -1,28 +1,17 @@
 #include <Arduino.h>
-
 #include <WiFi.h>
-
 #include <Firebase_ESP_Client.h>
 
-
-
 #include <SPI.h> 
-
 #include <Wire.h> 
-
 #include <ArduinoJson.h>
-
 #include <DHT.h>
-
 //Provide the token generation process info.
-
 #include "addons/TokenHelper.h"
-
 //Provide the RTDB payload printing info and other helper functions.
-
 #include "addons/RTDBHelper.h"
-
 #include "time.h"
+
 
 
 
@@ -62,7 +51,6 @@ DHT dht(DHTPIN, DHTTYPE);
 
 unsigned long sendDataPrevMillis = 0;
 
-int count = 0;
 
 bool signupOK = false;
 
