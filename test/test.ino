@@ -150,7 +150,7 @@ void loop(){
     }
 
     Serial.println();
-
+    count++;
   }
 }
 
