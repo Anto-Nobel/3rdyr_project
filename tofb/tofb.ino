@@ -93,7 +93,7 @@ String tellTime()
   struct tm timeinfo;
   getLocalTime(&timeinfo);
   char a[22];
-  strftime(a,22, "%Y-%m-%d - %X", &timeinfo);
+  strftime(a,22, "%d/%m/%Y-%X", &timeinfo);
   String t=convertToString(a,22);
   return t;
 }
