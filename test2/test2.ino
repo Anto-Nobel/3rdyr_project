@@ -224,7 +224,7 @@ void loop(){
     }
     if(count==0)
     {
-      json.setDouble("temperature/"+currDate+"/"+timeStamp,dht.readTemperature());
+      json.set("temperature/"+currDate+"/"+timeStamp,dht.readTemperature());
       Firebase.RTDB.set(&fbdo,F("test1"),&json);
       
     }
