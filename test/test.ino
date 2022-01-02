@@ -5,7 +5,6 @@
 #include <SPI.h> 
 #include <Wire.h> 
 #include <ArduinoJson.h>
-#include <DHT.h>
 //Provide the token generation process info.
 #include "addons/TokenHelper.h"
 //Provide the RTDB payload printing info and other helper functions.
@@ -15,8 +14,6 @@
 // Insert your network credentials
 #define WIFI_SSID "Arunkumar M"
 #define WIFI_PASSWORD "arun_2002"
-#define DHTPIN 4
-#define DHTTYPE DHT11
 // Insert Firebase project API Key
 #define API_KEY "AIzaSyAcSi97LtykSiVO3VPBLmXA_hj5HXOsLLA"
 
@@ -28,7 +25,6 @@ FirebaseData fbdo;
 
 FirebaseAuth auth;
 FirebaseConfig config;
-DHT dht(DHTPIN, DHTTYPE);
 unsigned long sendDataPrevMillis = 0;
 int count = 0;
 bool signupOK = false;
@@ -40,7 +36,6 @@ const int daylightOffset_sec = 3600;
 
 void setup(){
   Serial.begin(115200);
-  dht.begin();
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to Wi-Fi");
   while (WiFi.status() != WL_CONNECTED){
