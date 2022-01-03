@@ -1,6 +1,7 @@
 #include <Arduino.h>
-#ifdef ESP  
+#ifdef ESP32
   #include <WiFi.h>
+#endif
 #include <Firebase_ESP_Client.h>
 
 #include <SPI.h> 
@@ -28,13 +29,13 @@
 
 // Insert Firebase project API Key
 
-#define API_KEY "AIzaSyBWYbQAyNRSdDtik6Ws_B3KOle4SHDOu9w"
+#define API_KEY "AIzaSyAcSi97LtykSiVO3VPBLmXA_hj5HXOsLLA"
 
 
 
 // Insert RTDB URLefine the RTDB URL */
 
-#define DATABASE_URL "https://espdemojs-default-rtdb.asia-southeast1.firebasedatabase.app/" 
+#define DATABASE_URL "https://espdemofirebase-default-rtdb.asia-southeast1.firebasedatabase.app/" 
 
 
 
@@ -51,6 +52,7 @@ FirebaseConfig config;
 DHT dht(DHTPIN, DHTTYPE);
 
 unsigned long sendDataPrevMillis = 0;
+
 
 bool signupOK = false;
 
@@ -196,7 +198,7 @@ String tellDate()
 
   char a[22];
 
-  strftime(a,22, "%d/%m/%Y", &timeinfo);
+  strftime(a,22, "%d-%m-%Y", &timeinfo);
 
   String t=convertToString(a,22);
 
@@ -207,8 +209,12 @@ String tellDate()
 
 
 void loop(){
+
+  
+
   //sending data
-  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 60000 || sendDataPrevMillis == 0)){
+
+  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 30000 || sendDataPrevMillis == 0)){
 
     sendDataPrevMillis = millis();
     String timeStamp=tellTime();
@@ -216,21 +222,22 @@ void loop(){
     FirebaseJson json;
     if(!(Firebase.RTDB.getInt(&fbdo,"test1/temperature/"+currDate)))
     {
-      Serial.println("date not found\nso new node created");
       count=0;
     }
     if(count==0)
     {
-      json.setDouble("temperature/"+currDate+"/"+timeStamp,dht.readTemperature());
+      json.set("temperature/"+currDate+"/"+timeStamp,dht.readTemperature());
       //Firebase.RTDB.set(&fbdo,F("test1"),&json);
       Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/test1"), &json) ? "ok" : fbdo.errorReason().c_str());
+      
     }
     else
     {
       json.add(timeStamp,dht.readTemperature());
-      //Firebase.RTDB.updateNode(&fbdo,"test1/temperature/"+currDate,&json);
+      //Firebase.RTDB.updateNode(&fbdo,F("test1/temperature/"+currDate),&json);
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "test1/temperature/"+currDate, &json) ? "ok" : fbdo.errorReason().c_str());
     }  
     count++;
   }
+
 }
