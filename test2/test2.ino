@@ -1,8 +1,8 @@
 #include <Arduino.h>
-#ifdef ESP32  
+#ifdef ESP  
   #include <WiFi.h>
-#endif
 #include <Firebase_ESP_Client.h>
+
 #include <SPI.h> 
 #include <Wire.h> 
 #include <ArduinoJson.h>
