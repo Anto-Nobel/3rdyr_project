@@ -65,7 +65,8 @@ const char* ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 19800;
 
 const int daylightOffset_sec = 3600;
-unsigned long count = 0;
+unsigned long count1 = 0;
+unsigned long count2 = 0;
 
 
 void setup(){
@@ -219,25 +220,45 @@ void loop(){
     sendDataPrevMillis = millis();
     String timeStamp=tellTime();
     String currDate=tellDate();
-    FirebaseJson json;
-    if(!(Firebase.RTDB.getInt(&fbdo,"test1/temperature/"+currDate)))
+    FirebaseJson json1;
+    if(!(Firebase.RTDB.getInt(&fbdo,"sensor_1/temperature/"+currDate)))
     {
-      count=0;
+      count1=0;
     }
-    if(count==0)
+    if(count1==0)
     {
-      json.set("temperature/"+currDate+"/"+timeStamp,dht.readTemperature());
+      json1.set("temperature/"+currDate+"/"+timeStamp,dht.readTemperature());
       //Firebase.RTDB.set(&fbdo,F("test1"),&json);
-      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/test1"), &json) ? "ok" : fbdo.errorReason().c_str());
+      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1"), &json1) ? "ok" : fbdo.errorReason().c_str());
       
     }
     else
     {
-      json.add(timeStamp,dht.readTemperature());
+      json1.add(timeStamp,dht.readTemperature());
       //Firebase.RTDB.updateNode(&fbdo,F("test1/temperature/"+currDate),&json);
-      Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "test1/temperature/"+currDate, &json) ? "ok" : fbdo.errorReason().c_str());
+      Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/temperature/"+currDate, &json1) ? "ok" : fbdo.errorReason().c_str());
+    }
+    count1++;
+
+    FirebaseJson json2;
+    if(!(Firebase.RTDB.getInt(&fbdo,"sensor_1/humidity/"+currDate)))
+    {
+      count2=0;
+    }
+    if(count2==0)
+    {
+      json2.set("humidity/"+currDate+"/"+timeStamp,dht.readHumidity());
+      //Firebase.RTDB.set(&fbdo,F("test1"),&json);
+      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1"), &json2) ? "ok" : fbdo.errorReason().c_str());
+      
+    }
+    else
+    {
+      json2.add(timeStamp,dht.readHumidity());
+      //Firebase.RTDB.updateNode(&fbdo,F("test1/temperature/"+currDate),&json);
+      Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/humidity/"+currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
     }  
-    count++;
+    count2++;
   }
 
 }
