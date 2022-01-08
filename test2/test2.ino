@@ -65,8 +65,7 @@ const char* ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 19800;
 
 const int daylightOffset_sec = 3600;
-unsigned long count1 = 0;
-unsigned long count2 = 0;
+
 
 
 void setup(){
@@ -188,7 +187,7 @@ String tellTime()
 }
 
 
-
+//comment
 String tellDate()
 
 {
