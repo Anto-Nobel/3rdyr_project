@@ -211,54 +211,33 @@ String tellDate()
 
 void loop(){
 
-  
-
-  //sending data
-
   if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 300000 || sendDataPrevMillis == 0)){
-
     sendDataPrevMillis = millis();
     String timeStamp=tellTime();
     String currDate=tellDate();
     FirebaseJson json1;
     if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/temperature/"+currDate)))
     {
-    //  count1=0;
-    //}
-    //if(count1==0)
-    //{
       json1.set(currDate+"/"+timeStamp,dht.readTemperature());
-      //Firebase.RTDB.set(&fbdo,F("test1"),&json);
       Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1/temperature"), &json1) ? "ok" : fbdo.errorReason().c_str());
-      
     }
     else
     {
       json1.add(timeStamp,dht.readTemperature());
-      //Firebase.RTDB.updateNode(&fbdo,F("test1/temperature/"+currDate),&json);
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/temperature/"+currDate, &json1) ? "ok" : fbdo.errorReason().c_str());
     }
-    //count1++;
 
-    /*FirebaseJson json2;
-    if(!(Firebase.RTDB.getInt(&fbdo,"sensor_1/humidity/"+currDate)))
+    FirebaseJson json2;
+    if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/humidity/"+currDate)))
     {
-      count2=0;
-    }
-    if(count2==0)
-    {
-      json2.set("humidity/"+currDate+"/"+timeStamp,dht.readHumidity());
-      //Firebase.RTDB.set(&fbdo,F("test1"),&json);
-      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1"), &json2) ? "ok" : fbdo.errorReason().c_str());
-      
+      json2.set(currDate+"/"+timeStamp,dht.readHumidity());
+      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1/humidity"), &json2) ? "ok" : fbdo.errorReason().c_str());
     }
     else
     {
       json2.add(timeStamp,dht.readHumidity());
-      //Firebase.RTDB.updateNode(&fbdo,F("test1/temperature/"+currDate),&json);
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/humidity/"+currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
-    }  
-    count2++;*/
+    }
   }
 
 }
