@@ -211,7 +211,7 @@ String tellDate()
 
 void loop(){
 
-  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 300000 || sendDataPrevMillis == 0)){
+  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 30000 || sendDataPrevMillis == 0)){
     sendDataPrevMillis = millis();
     String timeStamp=tellTime();
     String currDate=tellDate();
