@@ -227,9 +227,9 @@ void loop(){
     //}
     //if(count1==0)
     //{
-      json1.set("temperature/"+currDate+"/"+timeStamp,dht.readTemperature());
+      json1.set(currDate+"/"+timeStamp,dht.readTemperature());
       //Firebase.RTDB.set(&fbdo,F("test1"),&json);
-      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1"), &json1) ? "ok" : fbdo.errorReason().c_str());
+      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1/temperature"), &json1) ? "ok" : fbdo.errorReason().c_str());
       
     }
     else
