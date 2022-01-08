@@ -215,18 +215,18 @@ void loop(){
 
   //sending data
 
-  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 30000 || sendDataPrevMillis == 0)){
+  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 300000 || sendDataPrevMillis == 0)){
 
     sendDataPrevMillis = millis();
     String timeStamp=tellTime();
     String currDate=tellDate();
     FirebaseJson json1;
-    if(!(Firebase.RTDB.getInt(&fbdo,"sensor_1/temperature/"+currDate)))
+    if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/temperature/"+currDate)))
     {
-      count1=0;
-    }
-    if(count1==0)
-    {
+    //  count1=0;
+    //}
+    //if(count1==0)
+    //{
       json1.set("temperature/"+currDate+"/"+timeStamp,dht.readTemperature());
       //Firebase.RTDB.set(&fbdo,F("test1"),&json);
       Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1"), &json1) ? "ok" : fbdo.errorReason().c_str());
@@ -238,9 +238,9 @@ void loop(){
       //Firebase.RTDB.updateNode(&fbdo,F("test1/temperature/"+currDate),&json);
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/temperature/"+currDate, &json1) ? "ok" : fbdo.errorReason().c_str());
     }
-    count1++;
+    //count1++;
 
-    FirebaseJson json2;
+    /*FirebaseJson json2;
     if(!(Firebase.RTDB.getInt(&fbdo,"sensor_1/humidity/"+currDate)))
     {
       count2=0;
@@ -258,7 +258,7 @@ void loop(){
       //Firebase.RTDB.updateNode(&fbdo,F("test1/temperature/"+currDate),&json);
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/humidity/"+currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
     }  
-    count2++;
+    count2++;*/
   }
 
 }
