@@ -20,7 +20,7 @@ FirebaseConfig config;
 unsigned long sendDataPrevMillis = 0;
 bool signupOK = false;
 
-unit8_t clgEspAddr[]={0xFC,0xF5,0xC4,0x0F,0x84,0x2C};
+uint8_t clgEspAddr[]={0xFC,0xF5,0xC4,0x0F,0x84,0x2C};
 
 float recvd_temperature;
 float recvd_humidity;
@@ -54,7 +54,7 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 }
 
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  memcpy(&incomingReadings, sensor1_data, sizeof(sensor1_data));
+  memcpy(&sensor1_data, incomingData, sizeof(sensor1_data));
   Serial.print("Bytes received: ");
   Serial.println(len);
   recvd_temperature = sensor1_data.temp;
@@ -148,7 +148,7 @@ void setup()
 
 void loop()
 {
-    trigger.trig=false;
+    trigger.trig=true;
     esp_err_t result = esp_now_send(clgEspAddr, (uint8_t *) &trigger, sizeof(trigger));
     if(result == ESP_OK)
     {
@@ -168,24 +168,24 @@ void loop()
     FirebaseJson json1;
     if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/temperature/"+currDate)))
     {
-      json1.set(currDate+"/"+timeStamp,dht.readTemperature());
+      json1.set(currDate+"/"+timeStamp,recvd_temperature);
       Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1/temperature"), &json1) ? "ok" : fbdo.errorReason().c_str());
     }
     else
     {
-      json1.add(timeStamp,dht.readTemperature());
+      json1.add(timeStamp,recvd_temperature);
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/temperature/"+currDate, &json1) ? "ok" : fbdo.errorReason().c_str());
     }
 
     FirebaseJson json2;
     if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/humidity/"+currDate)))
     {
-      json2.set(currDate+"/"+timeStamp,dht.readHumidity());
+      json2.set(currDate+"/"+timeStamp,recvd_humidity);
       Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1/humidity"), &json2) ? "ok" : fbdo.errorReason().c_str());
     }
     else
     {
-      json2.add(timeStamp,dht.readHumidity());
+      json2.add(timeStamp,recvd_humidity);
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/humidity/"+currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
     }
   }

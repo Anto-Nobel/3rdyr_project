@@ -82,7 +82,7 @@ void loop()
         dht_data.temp=dht.readTemperature();
         dht_data.hum=dht.readHumidity();
         Serial.println("trigger from Central ESP recieved");
-        esp_err_t result=esp_now_send(arunEspAddr,(unint8_t *) &dht_data,sizeof(dht_data));
+        esp_err_t result=esp_now_send(arunEspAddr,(uint8_t *) &dht_data,sizeof(dht_data));
         if(result == ESP_OK)
         {
             Serial.println("Data sent successfully");
