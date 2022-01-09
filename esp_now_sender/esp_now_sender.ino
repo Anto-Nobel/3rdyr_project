@@ -13,7 +13,7 @@
 
 DHT dht(DHTPIN, DHTTYPE); 
 
-unit8_t arunEspAddr[]={0x7C,0x9E,0xBD,0xE5,0x30,0x2C};
+uint8_t arunEspAddr[]={0x7C,0x9E,0xBD,0xE5,0x30,0x2C};
 
 bool incoming;
 
@@ -43,7 +43,7 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 }
 
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  memcpy(&msg_got, incomingData, sizeof(incomingReadings));
+  memcpy(&msg_got, incomingData, sizeof(msg_got));
   Serial.print("Bytes received: ");
   Serial.println(len);
   incoming = msg_got.trig;
