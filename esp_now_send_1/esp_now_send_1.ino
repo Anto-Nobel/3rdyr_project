@@ -49,7 +49,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   memcpy(&incomingMessage, incomingData, sizeof(incomingMessage));
   Serial.print("Bytes received: ");
   Serial.println(len);
-  incomingTrigger=incomingTrigger.trig;
+  incomingTrigger=incomingMessage.trig;
 }
 
 void setup() {
@@ -92,17 +92,19 @@ void loop() {
   // Set values to send
   DHT11Readings.temp = temperature;
   DHT11Readings.hum = humidity;
-  
+  if(incomingTrigger){
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &DHT11Readings, sizeof(DHT11Readings));
-   
+  }
   if (result == ESP_OK) {
     Serial.println("Sent with success");
   }
   else {
     Serial.println("Error sending the data");
   }
-  delay(10000);
+  delay(30000);
+  incomingTrigger=false;
+  //delay(10000);
 } 
 
 void getReadings(){
