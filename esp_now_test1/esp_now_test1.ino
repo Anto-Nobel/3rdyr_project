@@ -75,18 +75,7 @@ void setup() {
   Serial.begin(115200);
 
   // Init BME280 sensor
-  bool status = bme.begin(0x76);  
-  if (!status) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    while (1);
-  }
-
-  // Init OLED display
-  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { 
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;);
-  }
- 
+  
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
