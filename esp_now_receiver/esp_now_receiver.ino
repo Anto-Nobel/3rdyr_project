@@ -20,6 +20,8 @@ FirebaseConfig config;
 unsigned long sendDataPrevMillis = 0;
 bool signupOK = false;
 
+String success;
+
 uint8_t clgEspAddr[]={0xFC,0xF5,0xC4,0x0F,0x84,0x2C};
 
 float recvd_temperature;
@@ -124,7 +126,7 @@ void setup()
     Firebase.reconnectWiFi(true);
     
     //Time config.
-    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer)
+    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
     if(esp_now_init()!=ESP_OK)
     {
@@ -136,7 +138,7 @@ void setup()
   
   // Register peer
   esp_now_peer_info_t peerInfo;
-  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  memcpy(peerInfo.peer_addr, clgEspAddr, 6);
   peerInfo.channel = 0;  
   peerInfo.encrypt = false;
   
@@ -159,7 +161,7 @@ void loop()
     }
     else
     {
-        Serial.println("Trigger not sent")
+        Serial.println("Trigger not sent");
     }
 
     delay(30000); 
