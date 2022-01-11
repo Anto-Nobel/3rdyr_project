@@ -133,17 +133,20 @@ void setup()
     }
 
     esp_now_register_send_cb(OnDataSent);
-    
-    esp_now_peer_info_t peerInfo;
-    memcpy(peerInfo.peer_addr,clgEspAddr,6);
-    peerInfo.channel=0;
-    peerInfo.encrypt=false;
-    if(esp_now_add_peer(&peerInfo)!=ESP_OK){
-        Serial.println("Failed to connect to peer");
-        return;
-    }
-
-    esp_now_register_recv_cb(OnDataRecv);
+  
+  // Register peer
+  esp_now_peer_info_t peerInfo;
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  peerInfo.channel = 0;  
+  peerInfo.encrypt = false;
+  
+  // Add peer        
+  if (esp_now_add_peer(&peerInfo) != ESP_OK){
+    Serial.println("Failed to add peer");
+    return;
+  }
+  // Register for a callback function that will be called when data is received
+  esp_now_register_recv_cb(OnDataRecv);
 }
 
 void loop()
