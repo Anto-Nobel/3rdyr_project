@@ -7,6 +7,9 @@
 #include "addons/RTDBHelper.h"
 #include "time.h" 
 
+#define API_KEY "AIzaSyAcSi97LtykSiVO3VPBLmXA_hj5HXOsLLA"
+#define DATABASE_URL "https://espdemofirebase-default-rtdb.asia-southeast1.firebasedatabase.app/" 
+
 static const char* ssid     = "Arunkumar M";
 static const char* password = "arun_2002";
 // Structure to keep the temperature and humidity data
