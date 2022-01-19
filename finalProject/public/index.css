@@ -1,0 +1,36 @@
+body {
+  min-height: 100vh;
+  background: linear-gradient(rgba(63, 208, 212, 0.5), rgba(0, 0, 0, 0.7)),
+    url(https://github.com/john-smilga/javascript-basic-projects/blob/master/10-scroll/final/hero-bcg.jpeg?raw=true)
+      center/cover no-repeat;
+}
+main {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  min-height: 50vh;
+  background-color: green;
+  color: white;
+  border-radius: 0.5rem;
+  box-shadow: 5px 5px 5px 5px rgb(7, 7, 7);
+  width: 50%;
+  margin: auto;
+}
+main h1 {
+  color: rgb(204, 205, 206);
+}
+#main-btn {
+  border: none;
+  padding: 0.5rem;
+  border-radius: 1rem;
+}
+#main-btn a {
+  color: white;
+  text-decoration: none;
+}
+@media only screen and (max-width: 850px) {
+  main {
+    width: 100%;
+    min-height: 35vh;
+  }
+}

@@ -24,41 +24,41 @@
         </header>
 
         <!--                    Nav Bar                         -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
-                    aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse d-flex justify-content-around" id="navbarNavAltMarkup"
-                    style="transition: 1s;">
-                    <div class="navbar-nav" id="navbarNavAltMarkup">
-                        <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
-                        <a class="nav-link active" href="#">Pollution Monitor</a>
-                        <a class="nav-link active" href="#">Monthly report</a>
-                        <a class="nav-link active" href="#">Contact us</a>
-                    </div>
-                </div>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mt-2">
+            <button class="navbar-toggler" id="nav-toggle-button" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbar-menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar-menu">
+                <ul class="navbar-nav text-center ms-auto" id="nav-ul">
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="./index.html"
+                            id="nav-home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="./humidity.html">Pollution Monitor</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#">Monthly report</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="http://rmkec.ac.in/cel/showcontactus.php">Contact us</a></li>
+                </ul>
             </div>
         </nav>
 
         <!--                    Date Picker                      -->
 
     <div class="main-box">
-        <form action="" class="mt-3 mb-3">
+        <form action="" class="mt-3 mb-3"  id="date-form">
             <div>
                 <label for="inputBox" class="form-label">Date</label>
                 <input type="date" class="form-control" id="inputBox" required>
-                <button id="val-btn" class="btn-primary mt-2">Get Value</button>
+                <button id="val-btn" class="btn-primary mt-3 me-1">Get Value</button>
+               <button id="refresh-btn" class="btn-danger mt-3" onclick="reset()" formnovalidate>Reset Date</button>
             </div>
-            <h1 id="datec"></h1>
+            <h5 id="datec" class="mt-3"></h5>
         </form>
         <div class="emission-box box-1 mt-3">
             <h2><a href="./humidity.html" id="humidity-reading">Humidity</a></h2>
             <h2><a href="./temperature.html" id="temperature-reading">Temperature</a></h2>
         </div>
     </div>
+    <div class="average-reading"><h4 id="average-reading-h4"></h4></div>
+
     <div class="table-box">
         <table class="table">
             <thead class="table-dark">
@@ -77,6 +77,25 @@
     <!--                     Custom Js                      -->
     <script src="./index.js"></script>
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+            const firebaseConfig = {
+                apiKey: "AIzaSyCSSeqZ3GJCPUK14CsNfE9P3I4BJUcQNOQ",
+                authDomain: "espsensorjs.firebaseapp.com",
+                databaseURL: "https://espsensorjs-default-rtdb.asia-southeast1.firebasedatabase.app",
+                projectId: "espsensorjs",
+                storageBucket: "espsensorjs.appspot.com",
+                messagingSenderId: "563005482371",
+                appId: "1:563005482371:web:98ee5791a42d6f63f702b6"
+            };
+            const app = initializeApp(firebaseConfig);
+
+            import { getDatabase, ref, set, get, child, update, remove, onValue }
+                from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"
+
+            const db = getDatabase();
+        const tbody = document.getElementById("tbody1");
+        const averageReadingDisplay = document.getElementById("average-reading-h4")
+
          //////////////// CURRENT DATE  //////////////////////////
             let currentDay = new Date().getDate()
             let currentMonth = new Date().getMonth() + 1;
@@ -93,26 +112,54 @@
             }
 
             let systemCurrentDate = `${currentDay}-${currentMonth}-${currentYear}`;
-            console.log(systemCurrentDate);
+            //console.log(systemCurrentDate);
         //////////////// End CURRENT DATE  //////////////////////
 
         //////////////// USER INPUT DATE  //////////////////////
 
-        const valBox = document.getElementById("inputBox")
-            const dateh = document.getElementById("datec");
-            const valBtn = document.getElementById("val-btn")
+       const valBox = document.getElementById("inputBox");
+        const dateh = document.getElementById("datec");
+        const valBtn = document.getElementById("val-btn");
+
+        let correctFormatUserDate;
+         let clickEvent = 0; 
+        const currentDate =
             valBtn.addEventListener("click", () => {
-                
-                console.log(valBox.value);
-                dateh.innerHTML = valBox.value;
+                clickEvent = 1;
+                tbody.innerHTML = "";
+                let splitUserInputDate = valBox.value.split("-");
+                correctFormatUserDate = `${splitUserInputDate[2]}-${splitUserInputDate[1]}-${splitUserInputDate[0]}`
+                systemCurrentDate = correctFormatUserDate;
+                getAllDataOnce(systemCurrentDate);
+                dateh.innerHTML = systemCurrentDate;
                 valBox.value = "";
             })
 
         //////////////// END USER INPUT DATE  //////////////////////
-
-        const tbody = document.getElementById("tbody1");
-
         function addAllItemToTable(time, reading) {
+            let readingLength = reading.length;
+            //insertArray(readingLength);
+            console.log(time);
+            console.log(reading);
+            let averageReading = (reading.reduce((a, b) => a + b, 0)) / reading.length;
+            let finalAverageReading = averageReading.toFixed(2);
+            averageReadingDisplay.innerHTML = `Day average: ${finalAverageReading}`
+            //console.log(finalAverageReading);
+            function insertDate() {
+                set(ref(db, "Avg_sensor1/temperature/"+systemCurrentDate+"/"), {
+                  value : finalAverageReading
+                })
+            }
+            // function insertArray() {
+            //     set(ref(db, "TimeAndReading/All_Temperature_Time/" + systemCurrentDate), {
+            //         time: time
+            //     })
+            //     set(ref(db, "TimeAndReading/All_Temperature_Value/" + systemCurrentDate), {
+            //         value: reading
+            //     })
+            // }
+           insertDate();
+           //insertArray();
             for (let i = 0; i < reading.length; i++) {
                 let trow = document.createElement("tr");
 
@@ -135,39 +182,43 @@
                 tbody.appendChild(trow);
             }
         }
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyCSSeqZ3GJCPUK14CsNfE9P3I4BJUcQNOQ",
-            authDomain: "espsensorjs.firebaseapp.com",
-            databaseURL: "https://espsensorjs-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "espsensorjs",
-            storageBucket: "espsensorjs.appspot.com",
-            messagingSenderId: "563005482371",
-            appId: "1:563005482371:web:98ee5791a42d6f63f702b6"
-        };
-        const app = initializeApp(firebaseConfig);
+        
+        if(clickEvent == 0){
+            getAllDataOnce();
+            function getAllDataOnce() {
+                const dbref = ref(db);
+                get(child(dbref, `sensor_1/temperature/${systemCurrentDate}`))
+                    .then((snapshot) => {
+                        let tempDataKey = [];
+                        let tempDataVal = [];
+                        snapshot.forEach(childSnapShot => {
+                            let keyValueOfObject = childSnapShot.key;
+                            tempDataKey.push(keyValueOfObject);
+                            tempDataVal.push(childSnapShot.val());
 
-        import { getDatabase, ref, set, get, child, update, remove, onValue }
-            from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"
+                        });
+                        //console.log(tempDataVal);
+                        dateh.innerHTML = systemCurrentDate;
+                        addAllItemToTable(tempDataKey,tempDataVal)
+                    });
+            }
+        }
 
-        const db = getDatabase();
-
-        function getAllDataOnce() {
+        function getAllDataOnce(userDate) {
             const dbref = ref(db);
-            get(child(dbref, `sensor_1/temperature/${systemCurrentDate}`))
+            get(child(dbref, `sensor_1/temperature/${userDate}`))
                 .then((snapshot) => {
                     let tempDataKey = [];
                     let tempDataVal = [];
                     snapshot.forEach(childSnapShot => {
                         let keyValueOfObject = childSnapShot.key;
-                        tempDataVal.push(keyValueOfObject);
-                        tempDataKey.push(childSnapShot.val());
+                        tempDataKey.push(keyValueOfObject);
+                        tempDataVal.push(childSnapShot.val());
 
                     });
-                    addAllItemToTable(tempDataVal, tempDataKey)
+                    addAllItemToTable(tempDataKey,tempDataVal)
                 });
         }
-        window.onload = getAllDataOnce;
     </script>
 </body>
 </html>
