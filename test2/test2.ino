@@ -13,8 +13,15 @@
 //Provide the RTDB payload printing info and other helper functions.
 #include "addons/RTDBHelper.h"
 #include "time.h"
+#include <MQUnifiedsensor.h>
 
-
+#define placa "ESP-32"
+#define Voltage_Resolution 3.3
+#define pin 4 //Analog input 0 of your arduino
+#define type "MQ-135" //MQ135
+#define ADC_Bit_Resolution 12 // For arduino UNO/MEGA/NANO
+#define RatioMQ135CleanAir 3.6//RS / R0 = 3.6 ppm  
+//#define calibration_button 13 //Pin to calibrate your sensor
 
 
 // Insert your network credentials
@@ -37,7 +44,7 @@
 
 #define DATABASE_URL "https://espdemofirebase-default-rtdb.asia-southeast1.firebasedatabase.app/" 
 
-
+MQUnifiedsensor MQ135(placa, Voltage_Resolution, ADC_Bit_Resolution, pin, type);
 
 //Define Firebase Data object
 
@@ -142,7 +149,22 @@ void setup(){
 
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
+  MQ135.setRegressionMethod(1); 
+  MQ135.init();
+  MQ135.setRL(1); 
+  Serial.print("Calibrating please wait.");
+  float calcR0 = 0;
+  for(int i = 1; i<=10; i ++)
+  {
+    MQ135.update(); // Update data, the arduino will be read the voltage on the analog pin
+    calcR0 += MQ135.calibrate(RatioMQ135CleanAir);
+    Serial.print(".");
+  }
+  MQ135.setR0(calcR0/10);
+  Serial.println("  done!.");
   
+  if(isinf(calcR0)) {Serial.println("Warning: Conection issue founded, R0 is infite (Open circuit detected) please check your wiring and supply"); while(1);}
+  if(calcR0 == 0){Serial.println("Warning: Conection issue founded, R0 is zero (Analog pin with short circuit to ground) please check your wiring and supply"); while(1);}
 
 }
 
@@ -236,6 +258,21 @@ void loop(){
     {
       json2.add(timeStamp,dht.readHumidity());
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/humidity/"+currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
+    }
+
+    FirebaseJson json3;
+    MQ135.update();
+    MQ135.setA(110.47); MQ135.setB(-2.862); 
+    float CO2 = MQ135.readSensor()+415.08;
+    if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/co2/"+currDate)))
+    {
+      json3.set(currDate+"/"+timeStamp,CO2);
+      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1/co2"), &json3) ? "ok" : fbdo.errorReason().c_str());
+    }
+    else
+    {
+      json3.add(timeStamp,CO2);
+      Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/co2/"+currDate, &json3) ? "ok" : fbdo.errorReason().c_str());
     }
   }
 
