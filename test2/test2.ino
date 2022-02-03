@@ -42,9 +42,12 @@
 
 // Insert RTDB URLefine the RTDB URL */
 
-#define DATABASE_URL "https://espdemofirebase-default-rtdb.asia-southeast1.firebasedatabase.app/" 
+#define DATABASE_URL "https://espdemofirebase-default-rtdb.asia-southeast1.firebasedatabase.app/"  
 
-MQUnifiedsensor MQ135(placa, Voltage_Resolution, ADC_Bit_Resolution, pin, type);
+#define USER_EMAIL "dqwrqreho@gmail.com"
+#define USER_PASSWORD "ImITa@2021"
+
+//MQUnifiedsensor MQ135(placa, Voltage_Resolution, ADC_Bit_Resolution, pin, type);
 
 //Define Firebase Data object
 
@@ -107,7 +110,8 @@ void setup(){
 
   config.api_key = API_KEY;
 
-
+  auth.user.email = USER_EMAIL;
+  auth.user.password = USER_PASSWORD;
 
   /* Assign the RTDB URL (required) */
 
@@ -149,7 +153,7 @@ void setup(){
 
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
-  MQ135.setRegressionMethod(1); 
+  /*MQ135.setRegressionMethod(1); 
   MQ135.init();
   MQ135.setRL(1); 
   Serial.print("Calibrating please wait.");
@@ -165,7 +169,7 @@ void setup(){
   
   if(isinf(calcR0)) {Serial.println("Warning: Conection issue founded, R0 is infite (Open circuit detected) please check your wiring and supply"); while(1);}
   if(calcR0 == 0){Serial.println("Warning: Conection issue founded, R0 is zero (Analog pin with short circuit to ground) please check your wiring and supply"); while(1);}
-
+  */
 }
 
 
@@ -260,7 +264,7 @@ void loop(){
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/humidity/"+currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
     }
 
-    FirebaseJson json3;
+    /*FirebaseJson json3;
     MQ135.update();
     MQ135.setA(110.47); MQ135.setB(-2.862); 
     float CO2 = MQ135.readSensor()+415.08;
@@ -273,7 +277,7 @@ void loop(){
     {
       json3.add(timeStamp,CO2);
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/co2/"+currDate, &json3) ? "ok" : fbdo.errorReason().c_str());
-    }
+    }*/
   }
 
 }
