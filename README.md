@@ -1,10 +1,10 @@
 # 3rdyr_project
 
 Kanth firebase:
-https://espdemojs-default-rtdb.asia-southeast1.firebasedatabase.app/ 
+https://espsensorjs-default-rtdb.asia-southeast1.firebasedatabase.app/
 
 Web API Key :  
-AIzaSyBWYbQAyNRSdDtik6Ws_B3KOle4SHDOu9w 
+AIzaSyCSSeqZ3GJCPUK14CsNfE9P3I4BJUcQNOQ
 
 Anto firebase:
 

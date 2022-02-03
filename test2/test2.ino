@@ -36,13 +36,13 @@
 
 // Insert Firebase project API Key
 
-#define API_KEY "AIzaSyBWYbQAyNRSdDtik6Ws_B3KOle4SHDOu9w"
+#define API_KEY "AIzaSyCSSeqZ3GJCPUK14CsNfE9P3I4BJUcQNOQ"
 
 
 
 // Insert RTDB URLefine the RTDB URL */
 
-#define DATABASE_URL "https://espdemojs-default-rtdb.asia-southeast1.firebasedatabase.app/"  
+#define DATABASE_URL "https://espsensorjs-default-rtdb.asia-southeast1.firebasedatabase.app/"  
 
 #define USER_EMAIL "dqwrqreho@gmail.com"
 #define USER_PASSWORD "ImITa@2021"
