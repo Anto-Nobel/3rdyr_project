@@ -1,4 +1,6 @@
 {
     "configuration": "FlashFreq=80,UploadSpeed=921600,DebugLevel=none",
-    "board": "esp32:esp32:esp32doit-devkit-v1"
+    "board": "esp32:esp32:esp32doit-devkit-v1",
+    "port": "/dev/ttyUSB0",
+    "sketch": "test2/test2.ino"
 }
