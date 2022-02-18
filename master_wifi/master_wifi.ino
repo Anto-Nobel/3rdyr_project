@@ -35,6 +35,8 @@ void loop()
         }
         sarr[1]="";
         sarr[1]=rx.substring(strStart,i);
-
+        Serial.println(sarr[0]);
+        Serial.println(sarr[1]); 
+        Serial.println("------------");
     }
 }
