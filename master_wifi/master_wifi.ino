@@ -53,6 +53,8 @@ void setup()
     Serial.begin(115200);
     Serial2.begin(115200);
     
+    initWiFi();
+
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   
     config.api_key = API_KEY;
