@@ -164,7 +164,7 @@ void loop()
             if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/temperature/"+currDate)))
             {
                 json1.set(currDate+"/"+timeStamp,t);
-                Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1/temperature"), &json1) ? "ok" : fbdo.errorReason().c_str());
+                Serial.printf("Set json... %s\n", Firebase.RTDB.updateNode(&fbdo, F("/sensor_1/temperature"), &json1) ? "ok" : fbdo.errorReason().c_str());
             }
             else
             {
@@ -176,7 +176,7 @@ void loop()
             if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/humidity/"+currDate)))
             {
                 json2.set(currDate+"/"+timeStamp,h);
-                Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1/humidity"), &json2) ? "ok" : fbdo.errorReason().c_str());
+                Serial.printf("Set json... %s\n", Firebase.RTDB.updateNode(&fbdo, F("/sensor_1/humidity"), &json2) ? "ok" : fbdo.errorReason().c_str());
             }
             else
             {

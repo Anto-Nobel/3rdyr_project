@@ -27,13 +27,13 @@
 
 // Insert Firebase project API Key
 
-#define API_KEY "AIzaSyCSSeqZ3GJCPUK14CsNfE9P3I4BJUcQNOQ"
+#define API_KEY "AIzaSyAcSi97LtykSiVO3VPBLmXA_hj5HXOsLLA"
 
 
 
 // Insert RTDB URLefine the RTDB URL */
 
-#define DATABASE_URL "https://espsensorjs-default-rtdb.asia-southeast1.firebasedatabase.app/"  
+#define DATABASE_URL "https://espdemofirebase-default-rtdb.asia-southeast1.firebasedatabase.app/"  
 
 #define USER_EMAIL "dqwrqreho@gmail.com"
 #define USER_PASSWORD "ImITa@2021"
@@ -149,7 +149,7 @@ void loop()
     if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/temperature/"+currDate)))
     {
       json1.set(currDate+"/"+timeStamp,dht.readTemperature());
-      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1/temperature"), &json1) ? "ok" : fbdo.errorReason().c_str());
+      Serial.printf("Set json... %s\n", Firebase.RTDB.updateNode(&fbdo, F("/sensor_1/temperature"), &json1) ? "ok" : fbdo.errorReason().c_str());
     }
     else
     {
@@ -161,7 +161,7 @@ void loop()
     if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/humidity/"+currDate)))
     {
       json2.set(currDate+"/"+timeStamp,dht.readHumidity());
-      Serial.printf("Set json... %s\n", Firebase.RTDB.set(&fbdo, F("/sensor_1/humidity"), &json2) ? "ok" : fbdo.errorReason().c_str());
+      Serial.printf("Set json... %s\n", Firebase.RTDB.updateNode(&fbdo, F("/sensor_1/humidity"), &json2) ? "ok" : fbdo.errorReason().c_str());
     }
     else
     {
