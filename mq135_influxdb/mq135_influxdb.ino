@@ -102,6 +102,8 @@ void loop() {
   MQ135.setA(34.668); MQ135.setB(-3.369); 
   float Acetona = MQ135.readSensor();
 
+  Serial.printf("CO : %.3f | CO2 : %.3f | NH4 : %.3f\n",CO,CO2,NH4);
+
   sensor1.addField("reading",CO2);
   Serial.print("Writing: ");
   Serial.println(sensor1.toLineProtocol());
