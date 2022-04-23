@@ -33,7 +33,7 @@ Point sensor2("pollutionReading");
 Point sensor3("pollutionReading");
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   MQ135.setRegressionMethod(1);
   MQ135.init();
@@ -88,19 +88,14 @@ void loop() {
   sensor1.clearFields();
   sensor2.clearFields();
   sensor3.clearFields();
+
   MQ135.update();
   MQ135.setA(605.18); MQ135.setB(-3.937);
   float CO = MQ135.readSensor();
-  MQ135.setA(77.255); MQ135.setB(-3.18);
-  float Alcohol = MQ135.readSensor();
   MQ135.setA(110.47); MQ135.setB(-2.862);
   float CO2 = MQ135.readSensor();
-  MQ135.setA(44.947); MQ135.setB(-3.445);
-  float Tolueno = MQ135.readSensor();
   MQ135.setA(102.2 ); MQ135.setB(-2.473);
   float NH4 = MQ135.readSensor();
-  MQ135.setA(34.668); MQ135.setB(-3.369); 
-  float Acetona = MQ135.readSensor();
 
   Serial.printf("CO : %.3f | CO2 : %.3f | NH4 : %.3f\n",CO,CO2,NH4);
 
@@ -129,5 +124,5 @@ void loop() {
   }
 
   Serial.println("Wait 10s");
-  delay(5000);
+  delay(1000);
 }
