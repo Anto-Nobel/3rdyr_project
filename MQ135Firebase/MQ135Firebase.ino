@@ -61,8 +61,8 @@ void initWiFi(){
 }
 void setup() {
   //Init the serial port communication - to debug the library
-  Serial.begin(9600); //Init serial port
-
+  Serial.begin(115200); //Init serial port
+  initWiFi();
   //Set math model to calculate the PPM concentration and the value of constants
   MQ135.setRegressionMethod(1); //_PPM =  a*ratio^b
   
