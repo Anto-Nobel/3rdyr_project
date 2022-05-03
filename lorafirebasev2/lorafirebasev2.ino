@@ -58,7 +58,7 @@ void setup(){
     initWiFi();
     while(!Serial);
     LoRa.setPins(ss, rst, dio0);
-    while (!LoRa.begin(866E6)) {
+    while (!LoRa.begin(433E6)) {
     Serial.println(".");
     delay(500);
     }

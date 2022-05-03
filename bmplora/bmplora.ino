@@ -31,7 +31,7 @@ void setup()
     while (!Serial);
     // Serial.println("LoRa Se")
     LoRa.setPins(ss, rst, dio0);
-    while (!LoRa.begin(866E6))
+    while (!LoRa.begin(433E6))
     {
         Serial.println(".");
         delay(500);
@@ -41,12 +41,13 @@ void setup()
 }
 
 void loop() {
-  Serial.print("Sending packet: ");
-  Serial.println(counter);
+  Serial.println("Sending packet: ");
+  //Serial.println(counter);
 
   //Send LoRa packet to receiver
   LoRa.beginPacket();
-  LoRa.println(bmp.readTemperature());
+  LoRa.print(bmp.readTemperature());
+  LoRa.print();
   LoRa.println(bmp.readPressure());
   LoRa.endPacket();
   delay(3000);
