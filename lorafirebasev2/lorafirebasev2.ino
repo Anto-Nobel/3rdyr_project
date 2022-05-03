@@ -25,6 +25,14 @@
 #define USER_EMAIL "dqwrqreho@gmail.com"
 #define USER_PASSWORD "ImITa@2021"
 
+char array[7];
+char *smsg[2]; 
+char *ptr=NULL; 
+
+const int ms=27; 
+int mod=0;
+char a[10];
+
 FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
@@ -131,13 +139,20 @@ String tellDate()
 void loop(){
     int packetSize = LoRa.parsePacket();
   if (packetSize) {
-    while(){
-      temp = LoRa.readString().toFloat();
-      pres = LoRa.readString().toFloat();
-      Serial.println(temp); 
-      Serial.println(pres);
-    }
-    if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 30000 || sendDataPrevMillis == 0)){
+    while(LoRa.available()){
+    strcpy(array,LoRa.readString().c_str());
+    ptr=strtok(array,"="); 
+    smsg[0]=ptr; 
+    ptr=strtok(NULL,"=");
+    if(ptr!=NULL){smsg[1]=ptr;} 
+    Serial.println(smsg[0]); 
+    Serial.println(smsg[1]);
+    temp = smsg[0].toFloat();
+    pres = smsg[1].toFloat();
+    Serial.println(temp); 
+    Serial.println(pres);
+    }/*
+    if (Firebase.ready() && signupOK){
     sendDataPrevMillis = millis();
     String timeStamp=tellTime();
     String currDate=tellDate();
@@ -164,7 +179,6 @@ void loop(){
       json2.add(timeStamp,pres);
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/pressure/"+currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
     }
-
-  }
+  }*/
   }
 }

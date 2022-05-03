@@ -47,7 +47,7 @@ void loop() {
   //Send LoRa packet to receiver
   LoRa.beginPacket();
   LoRa.print(bmp.readTemperature());
-  LoRa.print();
+  LoRa.print(",");
   LoRa.println(bmp.readPressure());
   LoRa.endPacket();
   delay(3000);
