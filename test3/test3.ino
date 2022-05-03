@@ -3,10 +3,13 @@
   #include <WiFi.h>
 #endif
 #include <Firebase_ESP_Client.h>
-#include <SPI.h>
+
+#include <SPI.h> 
 #include <Wire.h> 
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BMP280.h>
 #include <ArduinoJson.h>
-#include <LoRa.h>
+//Provide the token generation process info.
 #include "addons/TokenHelper.h"
 //Provide the RTDB payload printing info and other helper functions.
 #include "addons/RTDBHelper.h"
@@ -16,23 +19,33 @@
 #define rst 14
 #define dio0 2
 
+#define BMP_SCK (13); 
+#define BMP_MISO (12); 
+#define BMP_MOSI (11); 
+#define BMP_CS (10);
+
+Adafruit_BMP280 bmp; 
+
+// Insert your network credentials
+
 #define WIFI_SSID "nobel"
+
 #define WIFI_PASSWORD "sarobert"
 
+// Insert Firebase project API Key
+
 #define API_KEY "AIzaSyBA-pMWgqxB4EnSzo8WSan63KxDjbim5f8"
+
+
+
+// Insert RTDB URLefine the RTDB URL */
+
 #define DATABASE_URL "https://eyantra-a53dd-default-rtdb.asia-southeast1.firebasedatabase.app/"  
 
 #define USER_EMAIL "dqwrqreho@gmail.com"
 #define USER_PASSWORD "ImITa@2021"
 
-char array[7];
-char *smsg[2]; 
-char *ptr=NULL; 
-
-const int ms=27; 
-int mod=0;
-char a[10];
-
+//Define Firebase Data object
 FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
@@ -40,13 +53,13 @@ FirebaseConfig config;
 bool signupOK=false;
 String uid;
 
+DHT dht(DHTPIN, DHTTYPE);
+unsigned long sendDataPrevMillis = 0;
+
 //NTP setup
 const char* ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 19800;
 const int daylightOffset_sec = 3600;
-
-float temp,pres;
-String stemp,spres;
 
 void initWiFi(){
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -63,17 +76,22 @@ void initWiFi(){
 }
 
 void setup(){
-    Serial.begin(115200);
-    initWiFi();
-    while(!Serial);
-    LoRa.setPins(ss, rst, dio0);
-    while (!LoRa.begin(433E6)) {
-    Serial.println(".");
-    delay(500);
-    }
-    LoRa.setSyncWord(0xF3);
-    Serial.println("LoRa Initializing OK!");
-    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  Serial.begin(115200);
+  
+  initWiFi();
+
+if (!bmp.begin(0x76)) {
+    Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
+  }
+
+  /* Default settings from datasheet. */
+  bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
+                  Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
+                  Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
+                  Adafruit_BMP280::FILTER_X16,      /* Filtering. */
+                  Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
+
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   
   config.api_key = API_KEY;
   /* Assign the RTDB URL (required) */
@@ -137,51 +155,36 @@ String tellDate()
   return t;
 } 
 
-void loop(){
-  int packetSize = LoRa.parsePacket();
-  if (packetSize) {
-    while(LoRa.available()){
-    strcpy(array,LoRa.readString().c_str());
-    ptr=strtok(array,","); 
-    smsg[0]=ptr; 
-    ptr=strtok(NULL,",");
-    if(ptr!=NULL){smsg[1]=ptr;} 
-    Serial.println(smsg[0]); 
-    Serial.println(smsg[1]);
-    strcpy(stemp,smsg[0]);
-    strcpy(spres,smsg[1]);
-    temp = stemp.toFloat();
-    pres = spres.toFloat();
-    Serial.println(temp); 
-    Serial.println(pres);
-    }/*
-    if (Firebase.ready() && signupOK){
-    //sendDataPrevMillis = millis();
+void loop()
+{
+  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 30000 || sendDataPrevMillis == 0)){
+    sendDataPrevMillis = millis();
     String timeStamp=tellTime();
     String currDate=tellDate();
     FirebaseJson json1;
     if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/temperature/"+currDate)))
     {
-      json1.set(currDate+"/"+timeStamp,temp);
+      json1.set(currDate+"/"+timeStamp,dht.readTemperature());
       Serial.printf("Set json... %s\n", Firebase.RTDB.updateNode(&fbdo, F("/sensor_1/temperature"), &json1) ? "ok" : fbdo.errorReason().c_str());
     }
     else
     {
-      json1.add(timeStamp,temp);
+      json1.add(timeStamp,dht.readTemperature());
       Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/temperature/"+currDate, &json1) ? "ok" : fbdo.errorReason().c_str());
     }
 
     FirebaseJson json2;
-    if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/pressure/"+currDate)))
+    if(!(Firebase.RTDB.getJSON(&fbdo,"sensor_1/humidity/"+currDate)))
     {
-      json2.set(currDate+"/"+timeStamp,pres);
-      Serial.printf("Set json... %s\n", Firebase.RTDB.updateNode(&fbdo, F("/sensor_1/pressure"), &json2) ? "ok" : fbdo.errorReason().c_str());
+      json2.set(currDate+"/"+timeStamp,dht.readHumidity());
+      Serial.printf("Set json... %s\n", Firebase.RTDB.updateNode(&fbdo, F("/sensor_1/humidity"), &json2) ? "ok" : fbdo.errorReason().c_str());
     }
     else
     {
-      json2.add(timeStamp,pres);
-      Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/pressure/"+currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
+      json2.add(timeStamp,dht.readHumidity());
+      Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/humidity/"+currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
     }
-  }*/
+
   }
+
 }
