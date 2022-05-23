@@ -4,6 +4,8 @@
 #endif
 #include <Firebase_ESP_Client.h>
 #include <HardwareSerial.h>
+#include "MHZ19.h"                                        
+#include <SoftwareSerial.h>                                
 #include <SPI.h>
 #include <Wire.h>
 #include <ArduinoJson.h>
@@ -22,16 +24,24 @@
 #define USER_EMAIL "dqwrqreho@gmail.com"
 #define USER_PASSWORD "ImITa@2021"
 
+#define RX_PIN 12                                          
+#define TX_PIN 13                                          
+#define BAUDRATE 9600                                      
+
 // Define Firebase Data object
 FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
+
+MHZ19 myMHZ19;                                             
+SoftwareSerial mySerial(RX_PIN, TX_PIN); 
 
 bool signupOK = false;
 String uid;
 byte cmd[] = {0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79};
 byte buf[9];
 uint16_t pm25, pm10;
+int CO2;
 
 unsigned long sendDataPrevMillis = 0;
 
@@ -60,6 +70,9 @@ void setup()
 {
     Serial.begin(9600);
     Serial2.begin(9600);
+    mySerial.begin(BAUDRATE);                               
+    myMHZ19.begin(mySerial);                                
+    myMHZ19.autoCalibration();   
     initWiFi();
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
@@ -137,7 +150,7 @@ void loop()
         Serial.print(pm25);
         pm10 = (buf[4] << 8) | buf[5];
         Serial.print("\n");
-
+        CO2 = myMHZ19.getCO2();
         FirebaseJson json1;
         if (!(Firebase.RTDB.getJSON(&fbdo, "sensor_1/pm25/" + currDate)))
         {
@@ -160,6 +173,18 @@ void loop()
         {
             json2.add(timeStamp, pm10);
             Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/pm10/" + currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
+        }
+
+        FirebaseJson json3;
+        if (!(Firebase.RTDB.getJSON(&fbdo, "sensor_1/CO2/" + currDate)))
+        {
+            json3.set(currDate + "/" + timeStamp, CO2);
+            Serial.printf("Set json... %s\n", Firebase.RTDB.updateNode(&fbdo, F("/sensor_1/CO2"), &json2) ? "ok" : fbdo.errorReason().c_str());
+        }
+        else
+        {
+            json3.add(timeStamp, CO2);
+            Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/CO2/" + currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
         }
     }
 }
