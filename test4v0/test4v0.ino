@@ -2,16 +2,12 @@
 #ifdef ESP32
 #include <WiFi.h>
 #endif
-#include <Firebase_ESP_Client.h>
 #include <HardwareSerial.h>
 #include "MHZ19.h"                                        
 #include <SoftwareSerial.h>                                
 #include <SPI.h>
 #include <Wire.h>
 #include <ArduinoJson.h>
-#include "addons/TokenHelper.h"
-#include "addons/RTDBHelper.h"
-#include "time.h"
 
 #define WIFI_SSID "Arunkumar M"
 #define WIFI_PASSWORD "arun_2002"
@@ -29,9 +25,9 @@
 #define BAUDRATE 9600                                      
 
 // Define Firebase Data object
-FirebaseData fbdo;
-FirebaseAuth auth;
-FirebaseConfig config;
+//FirebaseData fbdo;
+//FirebaseAuth auth;
+//FirebaseConfig config;
 
 MHZ19 myMHZ19;                                             
 SoftwareSerial mySerial(RX_PIN, TX_PIN); 
@@ -73,10 +69,10 @@ void setup()
     mySerial.begin(BAUDRATE);                               
     myMHZ19.begin(mySerial);                                
     myMHZ19.autoCalibration();   
-    initWiFi();
-    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+    //initWiFi();
+    //configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
-    config.api_key = API_KEY;
+    /*config.api_key = API_KEY;
     config.database_url = DATABASE_URL;
     auth.user.email = USER_EMAIL;
     auth.user.password = USER_PASSWORD;
@@ -94,7 +90,7 @@ void setup()
     signupOK = true;
     uid = auth.token.uid.c_str();
     Serial.print("User UID: ");
-    Serial.print(uid);
+    Serial.print(uid);*/
 }
 
 String convertToString(char *a, int size)
@@ -130,11 +126,11 @@ String tellDate()
 
 void loop()
 {
-    if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 30000 || sendDataPrevMillis == 0))
+    if ((millis() - sendDataPrevMillis > 30000 || sendDataPrevMillis == 0))
     {
         sendDataPrevMillis = millis();
-        String timeStamp = tellTime();
-        String currDate = tellDate();
+        //String timeStamp = tellTime();
+        //String currDate = tellDate();
         Serial2.write(cmd[0]);
         Serial2.write(cmd[1]);
         Serial2.write(cmd[2]);
