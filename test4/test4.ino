@@ -32,6 +32,7 @@
 FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
+int c=0;
 
 MHZ19 myMHZ19;                                             
 SoftwareSerial mySerial(RX_PIN, TX_PIN); 
@@ -135,6 +136,8 @@ void loop()
         sendDataPrevMillis = millis();
         String timeStamp = tellTime();
         String currDate = tellDate();
+        int i=0;
+        while((buf[0]!=255 || i<100)&&c==0){}
         Serial2.write(cmd[0]);
         Serial2.write(cmd[1]);
         Serial2.write(cmd[2]);
@@ -155,7 +158,9 @@ void loop()
         Serial.println(pm10);
         Serial.print("CO2 : ");
         Serial.println(CO2);
-        /*FirebaseJson json1;
+        i+=1;}
+        c=1;
+        FirebaseJson json1;
         if (!(Firebase.RTDB.getJSON(&fbdo, "sensor_1/pm25/" + currDate)))
         {
             json1.set(currDate + "/" + timeStamp, pm25);
@@ -189,6 +194,6 @@ void loop()
         {
             json3.add(timeStamp, CO2);
             Serial.printf("Update node... %s\n", Firebase.RTDB.updateNode(&fbdo, "sensor_1/CO2/" + currDate, &json2) ? "ok" : fbdo.errorReason().c_str());
-        }*/
+        }
     }
 }
