@@ -136,8 +136,8 @@ void loop()
         sendDataPrevMillis = millis();
         String timeStamp = tellTime();
         String currDate = tellDate();
-        int i=0;
-        while((buf[0]!=255 || i<100)&&c==0){
+        //int i=0;
+        //while((buf[0]!=255 || i<100)&&c==0){
         Serial2.write(cmd[0]);
         Serial2.write(cmd[1]);
         Serial2.write(cmd[2]);
@@ -147,19 +147,27 @@ void loop()
         Serial2.write(cmd[6]);
         Serial2.write(cmd[7]);
         Serial2.write(cmd[8]);
-        Serial2.readBytes(buf, sizeof(buf));
-        pm25 = (buf[2] << 4) | buf[3];
+        Serial2.readBytes(buf, sizeof(buf)); 
+        int startpos=0;
+        c=0;
+        for(int j=0;j<9;j++){
+            c+=buf[j];
+        }
+        while(buf[startpos]!=255 && c>0){
+            startpos+=1;
+        }
+        pm25 = (buf[(startpos+2)%9] << 4) | buf[(startpos+3)%9];
         Serial.print(" pm25=");
         Serial.print(pm25);
-        pm10 = (buf[4] << 4) | buf[5];
+        pm10 = (buf[(startpos+4)%9] << 4) | buf[(startpos+5)%9];
         Serial.print("\n");
         CO2 = myMHZ19.getCO2();
         Serial.print("pm10 : ");
         Serial.println(pm10);
         Serial.print("CO2 : ");
         Serial.println(CO2);
-        i+=1;}
-        c=1;
+        //i+=1;}
+        //c=1;
         FirebaseJson json1;
         if (!(Firebase.RTDB.getJSON(&fbdo, "sensor_1/pm25/" + currDate)))
         {
