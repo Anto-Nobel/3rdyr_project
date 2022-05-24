@@ -13,8 +13,8 @@
 #include "addons/RTDBHelper.h"
 #include "time.h"
 
-#define WIFI_SSID "Arunkumar M"
-#define WIFI_PASSWORD "arun_2002"
+#define WIFI_SSID "NaN"
+#define WIFI_PASSWORD "antonobel"
 #define API_KEY "AIzaSyA-u_CqSZoLKyeHxeN4qNzZO77sv8LT-CI"
 
 // Insert RTDB URLefine the RTDB URL */
