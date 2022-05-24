@@ -137,7 +137,7 @@ void loop()
         String timeStamp = tellTime();
         String currDate = tellDate();
         int i=0;
-        while((buf[0]!=255 || i<100)&&c==0){}
+        while((buf[0]!=255 || i<100)&&c==0){
         Serial2.write(cmd[0]);
         Serial2.write(cmd[1]);
         Serial2.write(cmd[2]);
