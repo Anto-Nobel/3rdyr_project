@@ -85,7 +85,8 @@ void loop()
     Serial.println(pm10);
     Serial.print("CO2 : ");
     CO2 = myMHZ19.getCO2();
-    Serial.println(CO2);
+    Serial.println(CO2); 
+    Serial.println("Sending Packet");
     LoRa.beginPacket();
     LoRa.print("0=");
     LoRa.print(pm25);
